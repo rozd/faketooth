@@ -7,10 +7,16 @@
 //
 
 import SwiftUI
+import Faketooth
 
 struct ContentView: View {
+
     var body: some View {
         Text("Hello, World!")
+    }
+
+    func test() {
+        CBCentralManager.simulatedPeripherals = []
     }
 }
 

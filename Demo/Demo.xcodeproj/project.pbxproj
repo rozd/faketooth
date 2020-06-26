@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		502FBC5F24A656660013FFAD /* Faketooth in Frameworks */ = {isa = PBXBuildFile; productRef = 502FBC5E24A656660013FFAD /* Faketooth */; };
 		50BB102124A64933006F64D8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BB102024A64933006F64D8 /* AppDelegate.swift */; };
 		50BB102324A64933006F64D8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BB102224A64933006F64D8 /* SceneDelegate.swift */; };
 		50BB102524A64933006F64D8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BB102424A64933006F64D8 /* ContentView.swift */; };
@@ -31,17 +32,26 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				502FBC5F24A656660013FFAD /* Faketooth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		502FBC5D24A656660013FFAD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		50BB101424A64933006F64D8 = {
 			isa = PBXGroup;
 			children = (
 				50BB101F24A64933006F64D8 /* Demo */,
 				50BB101E24A64933006F64D8 /* Products */,
+				502FBC5D24A656660013FFAD /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -91,6 +101,9 @@
 			dependencies = (
 			);
 			name = Demo;
+			packageProductDependencies = (
+				502FBC5E24A656660013FFAD /* Faketooth */,
+			);
 			productName = Demo;
 			productReference = 50BB101D24A64933006F64D8 /* Demo.app */;
 			productType = "com.apple.product-type.application";
@@ -342,6 +355,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		502FBC5E24A656660013FFAD /* Faketooth */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Faketooth;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 50BB101524A64933006F64D8 /* Project object */;
 }
