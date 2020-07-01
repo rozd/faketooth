@@ -29,27 +29,40 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
 + (void)load {
     static dispatch_once_t token;
     dispatch_once(&token, ^{
-        Class class = [self class];
+                Class class = [self class];
 
-        SEL originalSelector = @selector(scanForPeripheralsWithServices:options:);
-        SEL swizzledSelector = @selector(goldtooth_scanForPeripheralsWithServices:options:);
+        NSArray* selectors = @[
+            @[
+                NSStringFromSelector(@selector(scanForPeripheralsWithServices:options:)),
+                NSStringFromSelector(@selector(goldtooth_scanForPeripheralsWithServices:options:))
+            ],
+            @[
+                NSStringFromSelector(@selector(retrievePeripheralsWithIdentifiers:)),
+                NSStringFromSelector(@selector(goldtooth_retrievePeripheralsWithIdentifiers:))
+            ]
+        ];
 
-        Method originalMethod = class_getInstanceMethod(class, originalSelector);
-        Method swizzledMethod = class_getInstanceMethod(class, swizzledSelector);
+        for (NSArray* pair in selectors) {
+            SEL originalSelector = NSSelectorFromString([pair objectAtIndex:0]);
+            SEL swizzledSelector = NSSelectorFromString([pair objectAtIndex:1]);
 
-        BOOL didAddMethod =
-            class_addMethod(class,
-                            originalSelector,
-                            method_getImplementation(swizzledMethod),
-                            method_getTypeEncoding(swizzledMethod));
+            Method originalMethod = class_getInstanceMethod(class, originalSelector);
+            Method swizzledMethod = class_getInstanceMethod(class, swizzledSelector);
 
-        if (didAddMethod) {
-            class_replaceMethod(class,
-                                swizzledSelector,
-                                method_getImplementation(originalMethod),
-                                method_getTypeEncoding(originalMethod));
-        } else {
-            method_exchangeImplementations(originalMethod, swizzledMethod);
+            BOOL didAddMethod =
+                class_addMethod(class,
+                                originalSelector,
+                                method_getImplementation(swizzledMethod),
+                                method_getTypeEncoding(swizzledMethod));
+
+            if (didAddMethod) {
+                class_replaceMethod(class,
+                                    swizzledSelector,
+                                    method_getImplementation(originalMethod),
+                                    method_getTypeEncoding(originalMethod));
+            } else {
+                method_exchangeImplementations(originalMethod, swizzledMethod);
+            }
         }
     });
 }
@@ -78,6 +91,16 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
             }
         }
     });
+}
+
+- (NSArray<CBPeripheral*>*)goldtooth_retrievePeripheralsWithIdentifiers:(NSArray<NSUUID *> *)identifiers {
+    if (!CBCentralManager.simulatedPeripherals) {
+        return [self goldtooth_retrievePeripheralsWithIdentifiers:identifiers];
+    }
+
+    return [CBCentralManager.simulatedPeripherals filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(FaketoothPeripheral* peripheral, NSDictionary* bindings) {
+        return [identifiers containsObject:peripheral.identifier];
+    }]];
 }
 
 @end
