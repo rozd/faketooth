@@ -57,12 +57,14 @@
 }
 
 - (void)readValueForCharacteristic:(CBCharacteristic *)characteristic {
+    NSLog(@"[Faketooth] readValueForCharacteristic");
     if (self.delegate && [self.delegate respondsToSelector:@selector(peripheral:didUpdateValueForCharacteristic:error:)]) {
         [self.delegate peripheral:self didUpdateValueForCharacteristic:characteristic error:nil];
     }
 }
 
 - (void)writeValue:(NSData *)data forCharacteristic:(CBCharacteristic *)characteristic type:(CBCharacteristicWriteType)type {
+    NSLog(@"[Faketooth] writeValue:forCharacteristic:type:");
     FaketoothCharacteristic* faketoothCharacteristic = (FaketoothCharacteristic*)characteristic;
     if (!faketoothCharacteristic) {
         NSLog(@"[Faketooth] Warning: specified characteristic \"%@\" is not FaketoothCharacteristic subclass.", characteristic);
@@ -77,13 +79,20 @@
     }
 }
 
+- (NSUInteger)maximumWriteValueLengthForType:(CBCharacteristicWriteType)type {
+    NSLog(@"[Faketooth] maximumWriteValueLengthForType:");
+    return 20;
+}
+
 - (void)readValueForDescriptor:(CBDescriptor *)descriptor {
+    NSLog(@"[Faketooth] readValueForDescriptor:");
     if (self.delegate && [self.delegate respondsToSelector:@selector(peripheral:didUpdateValueForDescriptor:error:)]) {
         [self.delegate peripheral:self didUpdateValueForDescriptor:descriptor error:nil];
     }
 }
 
 - (void)writeValue:(NSData *)data forDescriptor:(CBDescriptor *)descriptor {
+    NSLog(@"[Faketooth] writeValue:forDescriptor:");
     FaketoothDescriptor* faketoothDescriptor = (FaketoothDescriptor*)descriptor;
     if (!descriptor) {
         NSLog(@"[Faketooth] Warning: specified descriptor \"%@\" is not FaketoothDescriptor subclass.", descriptor);
@@ -97,24 +106,28 @@
 }
 
 - (void)discoverServices:(NSArray<CBUUID *> *)serviceUUIDs {
+    NSLog(@"[Faketooth] discoverServices");
     if (self.delegate && [self.delegate respondsToSelector:@selector(peripheral:didDiscoverServices:)]) {
         [self.delegate peripheral:self didDiscoverServices:nil];
     }
 }
 
 - (void)discoverCharacteristics:(NSArray<CBUUID *> *)characteristicUUIDs forService:(CBService *)service {
+    NSLog(@"[Faketooth] discoverCharacteristics:forService:");
     if (self.delegate && [self.delegate respondsToSelector:@selector(peripheral:didDiscoverCharacteristicsForService:error:)]) {
         [self.delegate peripheral:self didDiscoverCharacteristicsForService:service error:nil];
     }
 }
 
 - (void)discoverIncludedServices:(NSArray<CBUUID *> *)includedServiceUUIDs forService:(CBService *)service {
+    NSLog(@"[Faketooth] includedServiceUUIDs:forService:");
     if (self.delegate && [self.delegate respondsToSelector:@selector(peripheral:didDiscoverIncludedServicesForService:error:)]) {
         [self.delegate peripheral:self didDiscoverIncludedServicesForService:service error:nil];
     }
 }
 
 - (void)discoverDescriptorsForCharacteristic:(CBCharacteristic *)characteristic {
+    NSLog(@"[Faketooth] discoverDescriptorsForCharacteristic:");
     if (self.delegate && [self.delegate respondsToSelector:@selector(peripheral:didDiscoverDescriptorsForCharacteristic:error:)]) {
         [self.delegate peripheral:self didDiscoverDescriptorsForCharacteristic:characteristic error:nil];
     }
