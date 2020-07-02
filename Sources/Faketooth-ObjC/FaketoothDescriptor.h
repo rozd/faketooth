@@ -15,9 +15,10 @@ typedef id _Nullable(^FaketoothDescriptorValueProducer)(void);
 @interface FaketoothDescriptor : CBDescriptor
 
 - (void)setCharacteristic:(CBCharacteristic*)characteristic;
+- (void)setValue:(NSData*)value;
 
 - (instancetype)init;
-- (instancetype)initWithUUID:(CBUUID*)uuid valueProducer:(FaketoothDescriptorValueProducer)valueProducer;
+- (instancetype)initWithUUID:(CBUUID*)uuid valueProducer:(nullable FaketoothDescriptorValueProducer)valueProducer;
 
 @end
 

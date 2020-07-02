@@ -15,7 +15,8 @@
     CBCharacteristicProperties _properties;
     BOOL _isNotifying;
     NSArray<CBDescriptor*>* _descriptors;
-    FaketoothPeripheralDataProducer _dataProducer;
+    FaketoothPeripheralValueProducer _valueProducer;
+    NSData* _value;
 }
 
 - (CBService*)service {
@@ -38,7 +39,16 @@
 }
 
 - (NSData *)value {
-    return _dataProducer();
+    if (_value) {
+        return _value;
+    }
+    if (_valueProducer) {
+        return _valueProducer();
+    }
+    return nil;
+}
+- (void)setValue:(nullable NSData*)value {
+    _value = value;
 }
 
 - (nullable NSArray<CBDescriptor*>*)descriptors {
@@ -49,17 +59,17 @@
     return self;
 }
 
-- (instancetype)initWithUUID:(CBUUID*)uuid dataProducer:(FaketoothPeripheralDataProducer)dataProducer properties:(CBCharacteristicProperties)properties isNotifying:(BOOL)isNotifying {
-    self = [self initWithUUID:uuid dataProducer:dataProducer properties:properties isNotifying:isNotifying descriptors:nil];
+- (instancetype)initWithUUID:(CBUUID*)uuid dataProducer:(nullable FaketoothPeripheralValueProducer)valueProducer properties:(CBCharacteristicProperties)properties isNotifying:(BOOL)isNotifying {
+    self = [self initWithUUID:uuid dataProducer:valueProducer properties:properties isNotifying:isNotifying descriptors:nil];
     return self;
 }
 
-- (instancetype)initWithUUID:(CBUUID*)uuid dataProducer:(FaketoothPeripheralDataProducer)dataProducer properties:(CBCharacteristicProperties)properties isNotifying:(BOOL)isNotifying descriptors:(nullable NSArray<CBDescriptor*>*)descriptors {
+- (instancetype)initWithUUID:(CBUUID*)uuid dataProducer:(nullable FaketoothPeripheralValueProducer)valueProducer properties:(CBCharacteristicProperties)properties isNotifying:(BOOL)isNotifying descriptors:(nullable NSArray<CBDescriptor*>*)descriptors {
     _uuid           = uuid;
     _properties     = properties;
     _isNotifying    = isNotifying;
     _descriptors    = descriptors;
-    _dataProducer   = dataProducer;
+    _valueProducer  = valueProducer;
 
     [_descriptors enumerateObjectsUsingBlock:^(CBDescriptor * _Nonnull descriptor, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([descriptor isKindOfClass:[FaketoothDescriptor class]]) {

@@ -10,15 +10,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NSData* _Nullable (^FaketoothPeripheralDataProducer)(void);
+typedef NSData* _Nullable (^FaketoothPeripheralValueProducer)(void);
 
 @interface FaketoothCharacteristic : CBCharacteristic
 
 - (void)setService:(CBService*)service;
+- (void)setValue:(nullable NSData*)value;
 
 - (instancetype)init;
-- (instancetype)initWithUUID:(CBUUID*)uuid dataProducer:(FaketoothPeripheralDataProducer)dataProducer properties:(CBCharacteristicProperties)properties isNotifying:(BOOL)isNotifying;
-- (instancetype)initWithUUID:(CBUUID*)uuid dataProducer:(FaketoothPeripheralDataProducer)dataProducer properties:(CBCharacteristicProperties)properties isNotifying:(BOOL)isNotifying descriptors:(nullable NSArray<CBDescriptor*>*)descriptors;
+- (instancetype)initWithUUID:(CBUUID*)uuid dataProducer:(nullable FaketoothPeripheralValueProducer)valueProducer properties:(CBCharacteristicProperties)properties isNotifying:(BOOL)isNotifying;
+- (instancetype)initWithUUID:(CBUUID*)uuid dataProducer:(nullable FaketoothPeripheralValueProducer)valueProducer properties:(CBCharacteristicProperties)properties isNotifying:(BOOL)isNotifying descriptors:(nullable NSArray<CBDescriptor*>*)descriptors;
 
 @end
 
