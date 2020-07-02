@@ -87,6 +87,7 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
 #pragma mark - Swizzled methods
 
 - (void)faketooth_scanForPeripheralsWithServices:(nullable NSArray<CBUUID *> *)serviceUUIDs options:(nullable NSDictionary<NSString *, id> *)options {
+    NSLog(@"[Faketooth] scanForPeripheralsWithServices:options:");
     if (!CBCentralManager.simulatedPeripherals) {
         [self faketooth_scanForPeripheralsWithServices:serviceUUIDs options:options];
         return;
@@ -102,6 +103,7 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
 }
 
 - (NSArray<CBPeripheral*>*)faketooth_retrievePeripheralsWithIdentifiers:(NSArray<NSUUID *> *)identifiers {
+    NSLog(@"[Faketooth] retrievePeripheralsWithIdentifiers:");
     if (!CBCentralManager.simulatedPeripherals) {
         return [self faketooth_retrievePeripheralsWithIdentifiers:identifiers];
     }
@@ -112,6 +114,7 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
 }
 
 - (void)faketooth_connectPeripheral:(CBPeripheral *)peripheral options:(NSDictionary<NSString *,id> *)options {
+    NSLog(@"[Faketooth] connectPeripheral:options:");
     if (!CBCentralManager.simulatedPeripherals) {
         [self faketooth_connectPeripheral:peripheral options:options];
         return;
@@ -125,10 +128,10 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
         return;
     }
 
-    faketoothPeripheral.state = CBPeripheralStateConnecting;
+    [faketoothPeripheral setState:CBPeripheralStateConnecting];
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        faketoothPeripheral.state = CBPeripheralStateConnected;
+        [faketoothPeripheral setState:CBPeripheralStateConnected];
         if (self.delegate && [self.delegate respondsToSelector:@selector(centralManager:didConnectPeripheral:)]) {
             [self.delegate centralManager:self didConnectPeripheral:peripheral];
         }
@@ -136,6 +139,7 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
 }
 
 - (void)faketooth_cancelPeripheralConnection:(CBPeripheral *)peripheral {
+    NSLog(@"[Faketooth] cancelPeripheralConnection:");
     if (!CBCentralManager.simulatedPeripherals) {
         [self faketooth_cancelPeripheralConnection:peripheral];
         return;
@@ -149,10 +153,10 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
         return;
     }
 
-    faketoothPeripheral.state = CBPeripheralStateDisconnecting;
+    [faketoothPeripheral setState:CBPeripheralStateDisconnecting];
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        faketoothPeripheral.state = CBPeripheralStateDisconnected;
+        [faketoothPeripheral setState:CBPeripheralStateDisconnected];
         if (self.delegate && [self.delegate respondsToSelector:@selector(centralManager:didDisconnectPeripheral:error:)]) {
             [self.delegate centralManager:self didDisconnectPeripheral:peripheral error:nil];
         }

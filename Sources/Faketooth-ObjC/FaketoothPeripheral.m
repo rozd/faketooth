@@ -23,6 +23,7 @@
 }
 
 - (CBPeripheralState)state {
+    NSLog(@"[Faketooth] Peripheral's state to return %li", (long)_state);
     return _state;
 }
 - (void)setState:(CBPeripheralState)state {
