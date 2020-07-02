@@ -48,6 +48,7 @@ class BluetoothManager: NSObject, ObservableObject {
                 name: "Test", services: [
                     FaketoothService(
                         uuid: CBUUID(),
+                        isPrimary: true,
                         characteristics: [
                             FaketoothCharacteristic(
                                 uuid: CBUUID(),

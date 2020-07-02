@@ -15,8 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setPeripheral:(CBPeripheral*)peripheral;
 
 - (instancetype)init;
-- (instancetype)initWithUUID:(CBUUID*)uuid characteristics:(NSArray<CBCharacteristic*>*)characteristics;
-- (instancetype)initWithUUID:(CBUUID*)uuid characteristics:(NSArray<CBCharacteristic*>*)characteristics includedServices:(nullable NSArray<CBService*>*) includedServices;
+- (instancetype)initWithUUID:(CBUUID*)uuid isPrimary:(BOOL)isPrimary characteristics:(NSArray<CBCharacteristic*>*)characteristics;
+- (instancetype)initWithUUID:(CBUUID*)uuid isPrimary:(BOOL)isPrimary characteristics:(NSArray<CBCharacteristic*>*)characteristics includedServices:(nullable NSArray<CBService*>*) includedServices;
 
 @end
 

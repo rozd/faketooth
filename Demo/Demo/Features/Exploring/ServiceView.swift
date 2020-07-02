@@ -36,6 +36,7 @@ struct ServiceView_Previews: PreviewProvider {
         ServiceView(service:
             FaketoothService(
                 uuid: CBUUID(),
+                isPrimary: true,
                 characteristics: [
 
                 ]

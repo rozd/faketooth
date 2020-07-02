@@ -14,6 +14,7 @@
     NSArray<CBCharacteristic*>* _characteristics;
     NSArray<CBService*>* _includedServices;
     CBPeripheral* _peripheral;
+    BOOL _isPrimary;
 }
 
 - (CBPeripheral*)peripheral {
@@ -25,6 +26,10 @@
 
 - (CBUUID*)UUID {
     return _uuid;
+}
+
+- (BOOL)isPrimary {
+    return _isPrimary;
 }
 
 - (NSArray<CBCharacteristic*>*)characteristics {
@@ -39,13 +44,14 @@
     return self;
 }
 
-- (instancetype)initWithUUID:(CBUUID*)uuid characteristics:(NSArray<CBCharacteristic*>*)characteristics {
-    self = [self initWithUUID:uuid characteristics:characteristics includedServices:nil];
+- (instancetype)initWithUUID:(CBUUID*)uuid isPrimary:(BOOL)isPrimary characteristics:(NSArray<CBCharacteristic*>*)characteristics {
+    self = [self initWithUUID:uuid isPrimary:isPrimary characteristics:characteristics includedServices:nil];
     return self;
 }
 
-- (instancetype)initWithUUID:(CBUUID*)uuid characteristics:(NSArray<CBCharacteristic*>*)characteristics includedServices:(nullable NSArray<CBService*>*) includedServices {
+- (instancetype)initWithUUID:(CBUUID*)uuid isPrimary:(BOOL)isPrimary characteristics:(NSArray<CBCharacteristic*>*)characteristics includedServices:(nullable NSArray<CBService*>*) includedServices {
     _uuid             = uuid;
+    _isPrimary        = isPrimary;
     _characteristics  = characteristics;
     _includedServices = includedServices;
 
