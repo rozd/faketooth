@@ -35,6 +35,7 @@
 }
 
 - (NSArray<CBService*>*)services {
+    NSLog(@"[Faketooth] Peripheral's services to return %@", _services);
     return _services;
 }
 
