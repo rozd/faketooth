@@ -34,11 +34,19 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
         NSArray* selectors = @[
             @[
                 NSStringFromSelector(@selector(scanForPeripheralsWithServices:options:)),
-                NSStringFromSelector(@selector(goldtooth_scanForPeripheralsWithServices:options:))
+                NSStringFromSelector(@selector(faketooth_scanForPeripheralsWithServices:options:))
             ],
             @[
                 NSStringFromSelector(@selector(retrievePeripheralsWithIdentifiers:)),
-                NSStringFromSelector(@selector(goldtooth_retrievePeripheralsWithIdentifiers:))
+                NSStringFromSelector(@selector(faketooth_retrievePeripheralsWithIdentifiers:))
+            ],
+            @[
+                NSStringFromSelector(@selector(connectPeripheral:options:)),
+                NSStringFromSelector(@selector(faketooth_connectPeripheral:options:))
+            ],
+            @[
+                NSStringFromSelector(@selector(cancelPeripheralConnection:)),
+                NSStringFromSelector(@selector(faketooth_cancelPeripheralConnection:))
             ]
         ];
 
@@ -78,9 +86,9 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
 
 #pragma mark - Swizzled methods
 
-- (void)goldtooth_scanForPeripheralsWithServices:(nullable NSArray<CBUUID *> *)serviceUUIDs options:(nullable NSDictionary<NSString *, id> *)options {
+- (void)faketooth_scanForPeripheralsWithServices:(nullable NSArray<CBUUID *> *)serviceUUIDs options:(nullable NSDictionary<NSString *, id> *)options {
     if (!CBCentralManager.simulatedPeripherals) {
-        [self goldtooth_scanForPeripheralsWithServices:serviceUUIDs options:options];
+        [self faketooth_scanForPeripheralsWithServices:serviceUUIDs options:options];
         return;
     }
 
@@ -93,14 +101,40 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
     });
 }
 
-- (NSArray<CBPeripheral*>*)goldtooth_retrievePeripheralsWithIdentifiers:(NSArray<NSUUID *> *)identifiers {
+- (NSArray<CBPeripheral*>*)faketooth_retrievePeripheralsWithIdentifiers:(NSArray<NSUUID *> *)identifiers {
     if (!CBCentralManager.simulatedPeripherals) {
-        return [self goldtooth_retrievePeripheralsWithIdentifiers:identifiers];
+        return [self faketooth_retrievePeripheralsWithIdentifiers:identifiers];
     }
 
     return [CBCentralManager.simulatedPeripherals filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(FaketoothPeripheral* peripheral, NSDictionary* bindings) {
         return [identifiers containsObject:peripheral.identifier];
     }]];
+}
+
+- (void)faketooth_connectPeripheral:(CBPeripheral *)peripheral options:(NSDictionary<NSString *,id> *)options {
+    if (!CBCentralManager.simulatedPeripherals) {
+        [self faketooth_connectPeripheral:peripheral options:options];
+        return;
+    }
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (self.delegate && [self.delegate respondsToSelector:@selector(centralManager:didConnectPeripheral:)]) {
+            [self.delegate centralManager:self didConnectPeripheral:peripheral];
+        }
+    });
+}
+
+- (void)faketooth_cancelPeripheralConnection:(CBPeripheral *)peripheral {
+    if (!CBCentralManager.simulatedPeripherals) {
+        [self faketooth_cancelPeripheralConnection:peripheral];
+        return;
+   }
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (self.delegate && [self.delegate respondsToSelector:@selector(centralManager:didDisconnectPeripheral:error:)]) {
+            [self.delegate centralManager:self didDisconnectPeripheral:peripheral error:nil];
+        }
+    });
 }
 
 @end
