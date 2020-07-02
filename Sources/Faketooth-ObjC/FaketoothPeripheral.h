@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface FaketoothPeripheral : CBPeripheral
 
+- (void)setState:(CBPeripheralState)state;
+
 - (instancetype)init;
 - (instancetype)initWithIdentifier:(NSUUID*)identifier name:(NSString*)name services:(NSArray<CBService*>*)services;
 

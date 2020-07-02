@@ -13,10 +13,18 @@
     NSUUID* _identifier;
     NSString* _name;
     NSArray<CBService*>* _services;
+    CBPeripheralState _state;
 }
 
 - (NSUUID*)identifier {
     return _identifier;
+}
+
+- (CBPeripheralState)state {
+    return _state;
+}
+- (void)setState:(CBPeripheralState)state {
+    _state = state;
 }
 
 - (NSString*)name {
@@ -35,6 +43,7 @@
     _identifier = identifier;
     _name       = name;
     _services   = services;
+    _state      = CBPeripheralStateDisconnected;
 
     [_services enumerateObjectsUsingBlock:^(CBService * _Nonnull service, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([service isKindOfClass:FaketoothService.class]) {

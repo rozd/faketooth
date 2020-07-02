@@ -117,7 +117,18 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
         return;
     }
 
+    FaketoothPeripheral* faketoothPeripheral = (FaketoothPeripheral*)peripheral;
+
+    if (!faketoothPeripheral) {
+        NSLog(@"[Faketooth] Warning: specified peripheral \"%@\" is not FaketoothPeripheral subclass.", peripheral);
+        [self faketooth_connectPeripheral:peripheral options:options];
+        return;
+    }
+
+    faketoothPeripheral.state = CBPeripheralStateConnecting;
+
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        faketoothPeripheral.state = CBPeripheralStateConnected;
         if (self.delegate && [self.delegate respondsToSelector:@selector(centralManager:didConnectPeripheral:)]) {
             [self.delegate centralManager:self didConnectPeripheral:peripheral];
         }
@@ -128,9 +139,20 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
     if (!CBCentralManager.simulatedPeripherals) {
         [self faketooth_cancelPeripheralConnection:peripheral];
         return;
-   }
+    }
+
+    FaketoothPeripheral* faketoothPeripheral = (FaketoothPeripheral*)peripheral;
+
+    if (!faketoothPeripheral) {
+        NSLog(@"[Faketooth] Warning: specified peripheral \"%@\" is not FaketoothPeripheral subclass.", peripheral);
+        [self faketooth_cancelPeripheralConnection:peripheral];
+        return;
+    }
+
+    faketoothPeripheral.state = CBPeripheralStateDisconnecting;
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        faketoothPeripheral.state = CBPeripheralStateDisconnected;
         if (self.delegate && [self.delegate respondsToSelector:@selector(centralManager:didDisconnectPeripheral:error:)]) {
             [self.delegate centralManager:self didDisconnectPeripheral:peripheral error:nil];
         }
