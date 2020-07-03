@@ -93,7 +93,9 @@
         FaketoothPeripheral* peripheral = (FaketoothPeripheral*)self.service.peripheral;
         NSLog(@"[Faketooth] notify timer for peripheral: %@", peripheral);
         if (peripheral) {
+            NSLog(@"[Faketooth] before [peripheral notifyDidUpdateValueForCharacteristic:self];");
             [peripheral notifyDidUpdateValueForCharacteristic:self];
+            NSLog(@"[Faketooth] after [peripheral notifyDidUpdateValueForCharacteristic:self];");
         }
     }];
 }
