@@ -85,11 +85,13 @@
 }
 
 - (void)createNotifyTimerIfNeeded {
+    NSLog(@"[Faketooth] createNotifyTimerIfNeeded");
     if (!self.isNotifying) {
         return;
     }
     _notifyTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 repeats:true block:^(NSTimer * _Nonnull timer) {
         FaketoothPeripheral* peripheral = (FaketoothPeripheral*)self.service.peripheral;
+        NSLog(@"[Faketooth] notify timer");
         if (peripheral) {
             [peripheral notifyDidUpdateValueForCharacteristic:self];
         }
@@ -97,6 +99,7 @@
 }
 
 - (void)removeNotifyTimerIfExists {
+    NSLog(@"[Faketooth] removeNotifyTimerIfExists");
     if (!_notifyTimer) {
         return;
     }

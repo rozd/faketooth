@@ -134,6 +134,7 @@
 }
 
 - (void)notifyDidUpdateValueForCharacteristic:(CBCharacteristic*)characteristic {
+    NSLog(@"[Faketooth] notifyDidUpdateValueForCharacteristic:");
     if (self.delegate && [self.delegate respondsToSelector:@selector(peripheral:didUpdateValueForCharacteristic:error:)]) {
         [self.delegate peripheral:self didUpdateValueForCharacteristic:characteristic error:nil];
     }
