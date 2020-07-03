@@ -91,7 +91,7 @@
     }
     _notifyTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 repeats:true block:^(NSTimer * _Nonnull timer) {
         FaketoothPeripheral* peripheral = (FaketoothPeripheral*)self.service.peripheral;
-        NSLog(@"[Faketooth] notify timer");
+        NSLog(@"[Faketooth] notify timer for peripheral: %@", peripheral);
         if (peripheral) {
             [peripheral notifyDidUpdateValueForCharacteristic:self];
         }
