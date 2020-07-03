@@ -8,6 +8,7 @@
 
 #import "FaketoothCharacteristic.h"
 #import "FaketoothDescriptor.h"
+#import "FaketoothPeripheral.h"
 
 @implementation FaketoothCharacteristic {
     CBService* _service;
@@ -17,13 +18,16 @@
     NSArray<CBDescriptor*>* _descriptors;
     FaketoothPeripheralValueProducer _valueProducer;
     NSData* _value;
+    NSTimer* _notifyTimer;
 }
 
 - (CBService*)service {
     return _service;
 }
 - (void)setService:(CBService*)service {
+    [self removeNotifyTimerIfExists];
     _service = service;
+    [self createNotifyTimerIfNeeded];
 }
 
 - (CBUUID*)UUID {
@@ -80,5 +84,24 @@
     return self;
 }
 
+- (void)createNotifyTimerIfNeeded {
+    if (!self.isNotifying) {
+        return;
+    }
+    _notifyTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 repeats:true block:^(NSTimer * _Nonnull timer) {
+        FaketoothPeripheral* peripheral = (FaketoothPeripheral*)self.service.peripheral;
+        if (peripheral) {
+            [peripheral notifyDidUpdateValueForCharacteristic:self];
+        }
+    }];
+}
+
+- (void)removeNotifyTimerIfExists {
+    if (!_notifyTimer) {
+        return;
+    }
+    [_notifyTimer invalidate];
+    _notifyTimer = nil;
+}
 
 @end

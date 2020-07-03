@@ -17,6 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (instancetype)initWithIdentifier:(NSUUID*)identifier name:(NSString*)name services:(NSArray<CBService*>*)services;
 
+- (void)notifyDidUpdateValueForCharacteristic:(CBCharacteristic*)characteristic;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -60,9 +60,7 @@
 
 - (void)readValueForCharacteristic:(CBCharacteristic *)characteristic {
     NSLog(@"[Faketooth] readValueForCharacteristic");
-    if (self.delegate && [self.delegate respondsToSelector:@selector(peripheral:didUpdateValueForCharacteristic:error:)]) {
-        [self.delegate peripheral:self didUpdateValueForCharacteristic:characteristic error:nil];
-    }
+    [self notifyDidUpdateValueForCharacteristic:characteristic];
 }
 
 - (void)writeValue:(NSData *)data forCharacteristic:(CBCharacteristic *)characteristic type:(CBCharacteristicWriteType)type {
@@ -132,6 +130,12 @@
     NSLog(@"[Faketooth] discoverDescriptorsForCharacteristic:");
     if (self.delegate && [self.delegate respondsToSelector:@selector(peripheral:didDiscoverDescriptorsForCharacteristic:error:)]) {
         [self.delegate peripheral:self didDiscoverDescriptorsForCharacteristic:characteristic error:nil];
+    }
+}
+
+- (void)notifyDidUpdateValueForCharacteristic:(CBCharacteristic*)characteristic {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(peripheral:didUpdateValueForCharacteristic:error:)]) {
+        [self.delegate peripheral:self didUpdateValueForCharacteristic:characteristic error:nil];
     }
 }
 
