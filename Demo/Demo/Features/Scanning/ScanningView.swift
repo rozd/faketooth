@@ -30,7 +30,7 @@ struct ScanningView: View {
 struct FoundPeripheralRow: View {
     var peripheral: FoundPeripheral
     var body: some View {
-        Text("\(peripheral.peripheral.name ?? "Unnamed")")
+        Text("\(peripheral.advertisementData[CBAdvertisementDataLocalNameKey] as? String ?? "Unnamed")")
     }
 }
 

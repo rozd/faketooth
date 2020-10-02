@@ -16,6 +16,14 @@
     NSString* _name;
     NSArray<CBService*>* _services;
     CBPeripheralState _state;
+    NSDictionary<NSString*, id>* _advertisementData;
+}
+
+- (NSDictionary<NSString*, id>*)advertisementData {
+    if (!_advertisementData) {
+        return @{};
+    }
+    return _advertisementData;
 }
 
 - (NSUUID*)identifier {
@@ -44,6 +52,19 @@
 }
 
 - (instancetype)initWithIdentifier:(NSUUID*)identifier name:(NSString*)name services:(NSArray<CBService*>*)services {
+    NSMutableArray* serviceUUIDs = [NSMutableArray arrayWithCapacity:services.count];
+    [services enumerateObjectsUsingBlock:^(CBService * _Nonnull service, NSUInteger idx, BOOL * _Nonnull stop) {
+        [serviceUUIDs addObject:service.UUID];
+    }];
+    NSDictionary* advertisementData = @{
+        CBAdvertisementDataLocalNameKey: name,
+        CBAdvertisementDataServiceUUIDsKey: serviceUUIDs,
+    };
+    self = [self initWithIdentifier:identifier name:name services:services advertisementData:advertisementData];
+    return self;
+}
+
+- (instancetype)initWithIdentifier:(NSUUID*)identifier name:(NSString*)name services:(NSArray<CBService*>*)services advertisementData:(NSDictionary<NSString*, id>*)advertisementData {
     _identifier = identifier;
     _name       = name;
     _services   = services;
@@ -54,6 +75,8 @@
             [((FaketoothService*)service) setPeripheral:self];
         }
     }];
+
+    _advertisementData = advertisementData;
 
     return self;
 }

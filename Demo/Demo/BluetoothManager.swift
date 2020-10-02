@@ -58,6 +58,9 @@ class BluetoothManager: NSObject, ObservableObject {
                             )
                         ]
                     )
+                ],
+                advertisementData: [
+                    CBAdvertisementDataLocalNameKey: "Name for Advertisement"
                 ]
             )
         ]

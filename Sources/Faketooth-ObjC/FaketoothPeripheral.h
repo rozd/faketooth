@@ -12,10 +12,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface FaketoothPeripheral : CBPeripheral
 
+@property (nonatomic, readonly) NSDictionary<NSString*, id>* advertisementData;
+
 - (void)setState:(CBPeripheralState)state;
 
 - (instancetype)init;
 - (instancetype)initWithIdentifier:(NSUUID*)identifier name:(NSString*)name services:(NSArray<CBService*>*)services;
+- (instancetype)initWithIdentifier:(NSUUID*)identifier name:(NSString*)name services:(NSArray<CBService*>*)services advertisementData:(NSDictionary<NSString*, id>*)advertisementData;
 
 - (void)notifyDidUpdateValueForCharacteristic:(CBCharacteristic*)characteristic;
 

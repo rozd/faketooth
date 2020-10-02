@@ -96,7 +96,7 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (self.delegate && [self.delegate respondsToSelector:@selector(centralManager:didDiscoverPeripheral:advertisementData:RSSI:)]) {
             for (FaketoothPeripheral* peripheral in CBCentralManager.simulatedPeripherals) {
-                [self.delegate centralManager:self didDiscoverPeripheral:peripheral advertisementData:@{} RSSI:[NSNumber numberWithInt:0]];
+                [self.delegate centralManager:self didDiscoverPeripheral:peripheral advertisementData:peripheral.advertisementData RSSI:[NSNumber numberWithInt:0]];
             }
         }
     });
