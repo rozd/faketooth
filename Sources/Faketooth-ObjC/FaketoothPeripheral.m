@@ -51,32 +51,34 @@
     return self;
 }
 
-- (instancetype)initWithIdentifier:(NSUUID*)identifier name:(NSString*)name services:(NSArray<CBService*>*)services {
-    NSMutableArray* serviceUUIDs = [NSMutableArray arrayWithCapacity:services.count];
-    [services enumerateObjectsUsingBlock:^(CBService * _Nonnull service, NSUInteger idx, BOOL * _Nonnull stop) {
-        [serviceUUIDs addObject:service.UUID];
-    }];
-    NSDictionary* advertisementData = @{
-        CBAdvertisementDataLocalNameKey: name,
-        CBAdvertisementDataServiceUUIDsKey: serviceUUIDs,
-    };
-    self = [self initWithIdentifier:identifier name:name services:services advertisementData:advertisementData];
-    return self;
-}
-
-- (instancetype)initWithIdentifier:(NSUUID*)identifier name:(NSString*)name services:(NSArray<CBService*>*)services advertisementData:(NSDictionary<NSString*, id>*)advertisementData {
+- (instancetype)initWithIdentifier:(NSUUID*)identifier name:(NSString*)name services:(nullable NSArray<CBService*>*)services advertisementData:(nullable NSDictionary<NSString*, id>*)advertisementData {
     _identifier = identifier;
     _name       = name;
     _services   = services;
     _state      = CBPeripheralStateDisconnected;
 
-    [_services enumerateObjectsUsingBlock:^(CBService * _Nonnull service, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([service isKindOfClass:FaketoothService.class]) {
-            [((FaketoothService*)service) setPeripheral:self];
-        }
-    }];
+    if (_services) {
+        [_services enumerateObjectsUsingBlock:^(CBService * _Nonnull service, NSUInteger idx, BOOL * _Nonnull stop) {
+            if ([service isKindOfClass:FaketoothService.class]) {
+                [((FaketoothService*)service) setPeripheral:self];
+            }
+        }];
+    }
 
-    _advertisementData = advertisementData;
+    if (!advertisementData) {
+        NSMutableArray* serviceUUIDs = [NSMutableArray array];
+        if (_services) {
+            [_services enumerateObjectsUsingBlock:^(CBService * _Nonnull service, NSUInteger idx, BOOL * _Nonnull stop) {
+                [serviceUUIDs addObject:service.UUID];
+            }];
+        }
+        _advertisementData = @{
+            CBAdvertisementDataLocalNameKey: name,
+            CBAdvertisementDataServiceUUIDsKey: serviceUUIDs,
+        };
+    } else {
+        _advertisementData = advertisementData;
+    }
 
     return self;
 }

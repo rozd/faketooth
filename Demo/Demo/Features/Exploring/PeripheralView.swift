@@ -37,9 +37,8 @@ struct PeripheralView_Previews: PreviewProvider {
             (peripheral: FaketoothPeripheral(
                 identifier: UUID(),
                 name: "Test",
-                services: [
-
-                ]),
+                services: nil,
+                advertisementData: nil),
              advertisementData: [:])
         )
     }

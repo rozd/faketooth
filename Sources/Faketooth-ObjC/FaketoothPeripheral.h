@@ -17,8 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setState:(CBPeripheralState)state;
 
 - (instancetype)init;
-- (instancetype)initWithIdentifier:(NSUUID*)identifier name:(NSString*)name services:(NSArray<CBService*>*)services;
-- (instancetype)initWithIdentifier:(NSUUID*)identifier name:(NSString*)name services:(NSArray<CBService*>*)services advertisementData:(NSDictionary<NSString*, id>*)advertisementData;
+- (instancetype)initWithIdentifier:(NSUUID*)identifier name:(NSString*)name services:(nullable NSArray<CBService*>*)services advertisementData:(nullable NSDictionary<NSString*, id>*)advertisementData;
 
 - (void)notifyDidUpdateValueForCharacteristic:(CBCharacteristic*)characteristic;
 
