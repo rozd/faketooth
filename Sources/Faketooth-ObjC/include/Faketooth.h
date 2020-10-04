@@ -11,3 +11,4 @@
 #import "../FaketoothService.h"
 #import "../FaketoothCharacteristic.h"
 #import "../FaketoothDescriptor.h"
+#import "../FaketoothSettings.h"

@@ -9,6 +9,7 @@
 #import <objc/runtime.h>
 
 #import "CBCentralManager+Faketooth.h"
+#import "FaketoothSettings.h"
 
 @implementation CBCentralManager (Goldtooth)
 
@@ -29,7 +30,7 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
 + (void)load {
     static dispatch_once_t token;
     dispatch_once(&token, ^{
-                Class class = [self class];
+        Class class = [self class];
 
         NSArray* selectors = @[
             @[
@@ -93,7 +94,7 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
         return;
     }
 
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FaketoothSettings.delay.scanForPeripheralDelayInSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (self.delegate && [self.delegate respondsToSelector:@selector(centralManager:didDiscoverPeripheral:advertisementData:RSSI:)]) {
             for (FaketoothPeripheral* peripheral in CBCentralManager.simulatedPeripherals) {
                 [self.delegate centralManager:self didDiscoverPeripheral:peripheral advertisementData:peripheral.advertisementData RSSI:[NSNumber numberWithInt:0]];
@@ -130,7 +131,7 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
 
     [faketoothPeripheral setState:CBPeripheralStateConnecting];
 
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FaketoothSettings.delay.connectPeripheralDelayInSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [faketoothPeripheral setState:CBPeripheralStateConnected];
         if (self.delegate && [self.delegate respondsToSelector:@selector(centralManager:didConnectPeripheral:)]) {
             [self.delegate centralManager:self didConnectPeripheral:peripheral];
@@ -155,7 +156,7 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
 
     [faketoothPeripheral setState:CBPeripheralStateDisconnecting];
 
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FaketoothSettings.delay.cancelPeripheralConnectionDelayInSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [faketoothPeripheral setState:CBPeripheralStateDisconnected];
         if (self.delegate && [self.delegate respondsToSelector:@selector(centralManager:didDisconnectPeripheral:error:)]) {
             [self.delegate centralManager:self didDisconnectPeripheral:peripheral error:nil];

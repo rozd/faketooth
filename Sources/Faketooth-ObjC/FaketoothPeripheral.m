@@ -10,6 +10,7 @@
 #import "FaketoothService.h"
 #import "FaketoothCharacteristic.h"
 #import "FaketoothDescriptor.h"
+#import "FaketoothSettings.h"
 
 @implementation FaketoothPeripheral {
     NSUUID* _identifier;
@@ -85,7 +86,9 @@
 
 - (void)readValueForCharacteristic:(CBCharacteristic *)characteristic {
     NSLog(@"[Faketooth] readValueForCharacteristic");
-    [self notifyDidUpdateValueForCharacteristic:characteristic];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FaketoothSettings.delay.readValueForCharacteristicDelayInSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self notifyDidUpdateValueForCharacteristic:characteristic];
+    });
 }
 
 - (void)writeValue:(NSData *)data forCharacteristic:(CBCharacteristic *)characteristic type:(CBCharacteristicWriteType)type {
@@ -99,7 +102,9 @@
     [faketoothCharacteristic setValue:data];
     if (type == CBCharacteristicWriteWithResponse) {
         if (self.delegate && [self.delegate respondsToSelector:@selector(peripheral:didWriteValueForCharacteristic:error:)]) {
-            [self.delegate peripheral:self didWriteValueForCharacteristic:characteristic error:nil];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FaketoothSettings.delay.writeValueForCharacteristicDelayInSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [self.delegate peripheral:self didWriteValueForCharacteristic:characteristic error:nil];
+            });
         }
     }
 }
@@ -112,7 +117,9 @@
 - (void)readValueForDescriptor:(CBDescriptor *)descriptor {
     NSLog(@"[Faketooth] readValueForDescriptor:");
     if (self.delegate && [self.delegate respondsToSelector:@selector(peripheral:didUpdateValueForDescriptor:error:)]) {
-        [self.delegate peripheral:self didUpdateValueForDescriptor:descriptor error:nil];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FaketoothSettings.delay.readValueForDescriptorDelayInSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self.delegate peripheral:self didUpdateValueForDescriptor:descriptor error:nil];
+        });
     }
 }
 
@@ -126,35 +133,45 @@
     }
     [faketoothDescriptor setValue:data];
     if (self.delegate && [self.delegate respondsToSelector:@selector(peripheral:didWriteValueForDescriptor:error:)]) {
-        [self.delegate peripheral:self didWriteValueForDescriptor:descriptor error:nil];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FaketoothSettings.delay.writeValueForDescriptorDelayInSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self.delegate peripheral:self didWriteValueForDescriptor:descriptor error:nil];
+        });
     }
 }
 
 - (void)discoverServices:(NSArray<CBUUID *> *)serviceUUIDs {
     NSLog(@"[Faketooth] discoverServices");
     if (self.delegate && [self.delegate respondsToSelector:@selector(peripheral:didDiscoverServices:)]) {
-        [self.delegate peripheral:self didDiscoverServices:nil];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FaketoothSettings.delay.discoverServicesDelayInSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self.delegate peripheral:self didDiscoverServices:nil];
+        });
     }
 }
 
 - (void)discoverCharacteristics:(NSArray<CBUUID *> *)characteristicUUIDs forService:(CBService *)service {
     NSLog(@"[Faketooth] discoverCharacteristics:forService:");
     if (self.delegate && [self.delegate respondsToSelector:@selector(peripheral:didDiscoverCharacteristicsForService:error:)]) {
-        [self.delegate peripheral:self didDiscoverCharacteristicsForService:service error:nil];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FaketoothSettings.delay.discoverCharacteristicsDelayInSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self.delegate peripheral:self didDiscoverCharacteristicsForService:service error:nil];
+        });
     }
 }
 
 - (void)discoverIncludedServices:(NSArray<CBUUID *> *)includedServiceUUIDs forService:(CBService *)service {
     NSLog(@"[Faketooth] includedServiceUUIDs:forService:");
     if (self.delegate && [self.delegate respondsToSelector:@selector(peripheral:didDiscoverIncludedServicesForService:error:)]) {
-        [self.delegate peripheral:self didDiscoverIncludedServicesForService:service error:nil];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FaketoothSettings.delay.discoverIncludedServicesDelayInSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self.delegate peripheral:self didDiscoverIncludedServicesForService:service error:nil];
+        });
     }
 }
 
 - (void)discoverDescriptorsForCharacteristic:(CBCharacteristic *)characteristic {
     NSLog(@"[Faketooth] discoverDescriptorsForCharacteristic:");
     if (self.delegate && [self.delegate respondsToSelector:@selector(peripheral:didDiscoverDescriptorsForCharacteristic:error:)]) {
-        [self.delegate peripheral:self didDiscoverDescriptorsForCharacteristic:characteristic error:nil];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FaketoothSettings.delay.discoverDescriptorsForCharacteristicDelayInSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self.delegate peripheral:self didDiscoverDescriptorsForCharacteristic:characteristic error:nil];
+        });
     }
 }
 

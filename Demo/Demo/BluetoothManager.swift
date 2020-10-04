@@ -65,6 +65,20 @@ class BluetoothManager: NSObject, ObservableObject {
             )
         ]
 
+        FaketoothSettings.delay = FaketoothDelaySettings(
+            scanForPeripheralDelayInSeconds: 0.1,
+            connectPeripheralDelayInSeconds: 1.0,
+            cancelPeripheralConnectionDelayInSeconds: 1.0,
+            discoverServicesDelayInSeconds: 0.1,
+            discoverCharacteristicsDelayInSeconds: 0.1,
+            discoverIncludedServicesDelayInSeconds: 0.1,
+            discoverDescriptorsForCharacteristicDelayInSeconds: 0.1,
+            readValueForCharacteristicDelayInSeconds: 0.1,
+            writeValueForCharacteristicDelayInSeconds: 0.1,
+            readValueForDescriptorDelayInSeconds: 0.1,
+            writeValueForDescriptorDelayInSeconds: 0.1
+        )
+
         manager = CBCentralManager(delegate: self, queue: centralQueue)
 
         $state

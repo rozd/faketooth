@@ -1,3 +1,3 @@
 # Faketooth
 
-A description of this package.
+Bluetooth simulator for iOS

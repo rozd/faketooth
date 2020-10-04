@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CBCentralManager (Faketooth)
 
-@property (class, nullable) NSArray<FaketoothPeripheral*>* simulatedPeripherals;
+@property (class, nullable, nonatomic) NSArray<FaketoothPeripheral*>* simulatedPeripherals;
 
 @property (class) BOOL isSimulated;
 
