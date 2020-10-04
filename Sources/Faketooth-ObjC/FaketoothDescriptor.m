@@ -35,7 +35,7 @@
     }
     return nil;
 }
-- (void)setValue:(NSData*)value {
+- (void)setValue:(nullable NSData*)value {
     _value = value;
 }
 

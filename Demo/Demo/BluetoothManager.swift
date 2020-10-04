@@ -52,8 +52,16 @@ class BluetoothManager: NSObject, ObservableObject {
                         characteristics: [
                             FaketoothCharacteristic(
                                 uuid: CBUUID(),
-                                dataProducer: { return "Hello".data(using: .utf8) },
-                                properties: [.read, .notify]
+                                valueProducer: { return "Hello".data(using: .utf8) },
+                                properties: [.read, .notify],
+                                descriptors: [
+                                    FaketoothDescriptor(
+                                        uuid: CBUUID(string: "2902"),
+                                        valueProducer: { () -> Any? in
+                                            return Data(capacity: 2)
+                                        }
+                                    )
+                                ]
                             )
                         ]
                     )

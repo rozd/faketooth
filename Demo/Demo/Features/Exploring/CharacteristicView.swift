@@ -49,7 +49,7 @@ struct CharacteristicView_Previews: PreviewProvider {
             CharacteristicViewModel(characteristic:
                 FaketoothCharacteristic(
                     uuid: CBUUID(),
-                    dataProducer: { nil },
+                    valueProducer: { nil },
                     properties: CBCharacteristicProperties.read
                 )
             )

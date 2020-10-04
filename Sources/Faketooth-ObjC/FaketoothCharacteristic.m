@@ -61,12 +61,12 @@
     return self;
 }
 
-- (instancetype)initWithUUID:(CBUUID*)uuid dataProducer:(nullable FaketoothPeripheralValueProducer)valueProducer properties:(CBCharacteristicProperties)properties {
-    self = [self initWithUUID:uuid dataProducer:valueProducer properties:properties descriptors:nil];
+- (instancetype)initWithUUID:(CBUUID*)uuid valueProducer:(nullable FaketoothPeripheralValueProducer)valueProducer properties:(CBCharacteristicProperties)properties {
+    self = [self initWithUUID:uuid valueProducer:valueProducer properties:properties descriptors:nil];
     return self;
 }
 
-- (instancetype)initWithUUID:(CBUUID*)uuid dataProducer:(nullable FaketoothPeripheralValueProducer)valueProducer properties:(CBCharacteristicProperties)properties descriptors:(nullable NSArray<CBDescriptor*>*)descriptors {
+- (instancetype)initWithUUID:(CBUUID*)uuid valueProducer:(nullable FaketoothPeripheralValueProducer)valueProducer properties:(CBCharacteristicProperties)properties descriptors:(nullable NSArray<CBDescriptor*>*)descriptors {
     _uuid           = uuid;
     _properties     = properties;
     _descriptors    = descriptors;
