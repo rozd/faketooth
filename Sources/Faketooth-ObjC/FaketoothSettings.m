@@ -1,6 +1,6 @@
 //
 //  MyClass.m
-//  
+//
 //
 //  Created by Max Rozdobudko on 10/4/20.
 //
@@ -21,6 +21,7 @@ static FaketoothDelaySettings _delaySettings = {
     .writeValueForCharacteristicDelayInSeconds              = 0.1,
     .readValueForDescriptorDelayInSeconds                   = 0.1,
     .writeValueForDescriptorDelayInSeconds                  = 0.1,
+    .setNotifyValueForCharacteristicDelayInSeconds          = 0.1,
 };
 
 + (FaketoothDelaySettings)delay {

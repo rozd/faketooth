@@ -50,8 +50,7 @@ struct CharacteristicView_Previews: PreviewProvider {
                 FaketoothCharacteristic(
                     uuid: CBUUID(),
                     dataProducer: { nil },
-                    properties: CBCharacteristicProperties.read,
-                    isNotifying: false
+                    properties: CBCharacteristicProperties.read
                 )
             )
         )

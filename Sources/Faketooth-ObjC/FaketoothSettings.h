@@ -1,6 +1,6 @@
 //
 //  MyClass.h
-//  
+//
 //
 //  Created by Max Rozdobudko on 10/4/20.
 //
@@ -22,6 +22,7 @@ typedef struct {
     float writeValueForCharacteristicDelayInSeconds;
     float readValueForDescriptorDelayInSeconds;
     float writeValueForDescriptorDelayInSeconds;
+    float setNotifyValueForCharacteristicDelayInSeconds;
 } FaketoothDelaySettings;
 
 @interface FaketoothSettings : NSObject

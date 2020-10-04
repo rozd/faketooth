@@ -18,8 +18,10 @@ typedef NSData* _Nullable (^FaketoothPeripheralValueProducer)(void);
 - (void)setValue:(nullable NSData*)value;
 
 - (instancetype)init;
-- (instancetype)initWithUUID:(CBUUID*)uuid dataProducer:(nullable FaketoothPeripheralValueProducer)valueProducer properties:(CBCharacteristicProperties)properties isNotifying:(BOOL)isNotifying;
-- (instancetype)initWithUUID:(CBUUID*)uuid dataProducer:(nullable FaketoothPeripheralValueProducer)valueProducer properties:(CBCharacteristicProperties)properties isNotifying:(BOOL)isNotifying descriptors:(nullable NSArray<CBDescriptor*>*)descriptors;
+- (instancetype)initWithUUID:(CBUUID*)uuid dataProducer:(nullable FaketoothPeripheralValueProducer)valueProducer properties:(CBCharacteristicProperties)properties;
+- (instancetype)initWithUUID:(CBUUID*)uuid dataProducer:(nullable FaketoothPeripheralValueProducer)valueProducer properties:(CBCharacteristicProperties)properties descriptors:(nullable NSArray<CBDescriptor*>*)descriptors;
+
+- (void)setIsNotifying:(BOOL)value;
 
 @end
 

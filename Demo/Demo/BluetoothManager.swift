@@ -53,8 +53,7 @@ class BluetoothManager: NSObject, ObservableObject {
                             FaketoothCharacteristic(
                                 uuid: CBUUID(),
                                 dataProducer: { return "Hello".data(using: .utf8) },
-                                properties: [.read, .notify],
-                                isNotifying: true
+                                properties: [.read, .notify]
                             )
                         ]
                     )
@@ -76,7 +75,8 @@ class BluetoothManager: NSObject, ObservableObject {
             readValueForCharacteristicDelayInSeconds: 0.1,
             writeValueForCharacteristicDelayInSeconds: 0.1,
             readValueForDescriptorDelayInSeconds: 0.1,
-            writeValueForDescriptorDelayInSeconds: 0.1
+            writeValueForDescriptorDelayInSeconds: 0.1,
+            setNotifyValueForCharacteristicDelayInSeconds: 0.1
         )
 
         manager = CBCentralManager(delegate: self, queue: centralQueue)

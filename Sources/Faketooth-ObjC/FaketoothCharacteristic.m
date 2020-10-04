@@ -25,9 +25,7 @@
     return _service;
 }
 - (void)setService:(CBService*)service {
-    [self removeNotifyTimerIfExists];
     _service = service;
-    [self createNotifyTimerIfNeeded];
 }
 
 - (CBUUID*)UUID {
@@ -63,15 +61,14 @@
     return self;
 }
 
-- (instancetype)initWithUUID:(CBUUID*)uuid dataProducer:(nullable FaketoothPeripheralValueProducer)valueProducer properties:(CBCharacteristicProperties)properties isNotifying:(BOOL)isNotifying {
-    self = [self initWithUUID:uuid dataProducer:valueProducer properties:properties isNotifying:isNotifying descriptors:nil];
+- (instancetype)initWithUUID:(CBUUID*)uuid dataProducer:(nullable FaketoothPeripheralValueProducer)valueProducer properties:(CBCharacteristicProperties)properties {
+    self = [self initWithUUID:uuid dataProducer:valueProducer properties:properties descriptors:nil];
     return self;
 }
 
-- (instancetype)initWithUUID:(CBUUID*)uuid dataProducer:(nullable FaketoothPeripheralValueProducer)valueProducer properties:(CBCharacteristicProperties)properties isNotifying:(BOOL)isNotifying descriptors:(nullable NSArray<CBDescriptor*>*)descriptors {
+- (instancetype)initWithUUID:(CBUUID*)uuid dataProducer:(nullable FaketoothPeripheralValueProducer)valueProducer properties:(CBCharacteristicProperties)properties descriptors:(nullable NSArray<CBDescriptor*>*)descriptors {
     _uuid           = uuid;
     _properties     = properties;
-    _isNotifying    = isNotifying;
     _descriptors    = descriptors;
     _valueProducer  = valueProducer;
 
@@ -80,8 +77,17 @@
             [((FaketoothDescriptor*)descriptor) setCharacteristic:self];
         }
     }];
-    
+
     return self;
+}
+
+- (void)setIsNotifying:(BOOL)value {
+    _isNotifying = value;
+    if (_isNotifying) {
+        [self createNotifyTimerIfNeeded];
+    } else {
+        [self removeNotifyTimerIfExists];
+    }
 }
 
 - (void)createNotifyTimerIfNeeded {

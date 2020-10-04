@@ -84,6 +84,26 @@
     return self;
 }
 
+#pragma mark Set Notify
+
+- (void)setNotifyValue:(BOOL)enabled forCharacteristic:(CBCharacteristic *)characteristic {
+    NSLog(@"[Faketooth] setNotifyValue:forCharacteristic");
+    FaketoothCharacteristic* faketoothCharacteristic = (FaketoothCharacteristic*)characteristic;
+    if (!faketoothCharacteristic) {
+        NSLog(@"[Faketooth] Warning: specified characteristic \"%@\" is not a FaketoothCharacteristic subclass.", characteristic);
+        [super setNotifyValue:enabled forCharacteristic:characteristic];
+        return;
+    }
+    [faketoothCharacteristic setIsNotifying:enabled];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(peripheral:didUpdateNotificationStateForCharacteristic:error:)]) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FaketoothSettings.delay.setNotifyValueForCharacteristicDelayInSeconds)), dispatch_get_main_queue(), ^{
+            [self.delegate peripheral:self didUpdateNotificationStateForCharacteristic:characteristic error:nil];
+        });
+    }
+}
+
+#pragma mark Characteristics
+
 - (void)readValueForCharacteristic:(CBCharacteristic *)characteristic {
     NSLog(@"[Faketooth] readValueForCharacteristic");
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FaketoothSettings.delay.readValueForCharacteristicDelayInSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -95,7 +115,7 @@
     NSLog(@"[Faketooth] writeValue:forCharacteristic:type:");
     FaketoothCharacteristic* faketoothCharacteristic = (FaketoothCharacteristic*)characteristic;
     if (!faketoothCharacteristic) {
-        NSLog(@"[Faketooth] Warning: specified characteristic \"%@\" is not FaketoothCharacteristic subclass.", characteristic);
+        NSLog(@"[Faketooth] Warning: specified characteristic \"%@\" is not a FaketoothCharacteristic subclass.", characteristic);
         [super writeValue:data forCharacteristic:characteristic type:type];
         return;
     }
