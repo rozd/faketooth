@@ -12,6 +12,7 @@
     CBCharacteristic* _characteristic;
     CBUUID* _uuid;
     FaketoothDescriptorValueProducer _valueProducer;
+    FaketoothDescriptorValueHandler _valueHandler;
     NSData* _value;
 }
 
@@ -37,15 +38,19 @@
 }
 - (void)setValue:(nullable NSData*)value {
     _value = value;
+    if (_valueHandler) {
+        _valueHandler(value);
+    }
 }
 
 - (instancetype)init {
     return self;
 }
 
-- (instancetype)initWithUUID:(CBUUID*)uuid valueProducer:(nullable FaketoothDescriptorValueProducer)valueProducer {
+- (instancetype)initWithUUID:(CBUUID*)uuid valueProducer:(nullable FaketoothDescriptorValueProducer)valueProducer valueHandler:(nullable FaketoothDescriptorValueHandler)valueHandler {
     _uuid           = uuid;
     _valueProducer  = valueProducer;
+    _valueHandler   = valueHandler;
     return self;
 }
 

@@ -11,6 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef id _Nullable(^FaketoothDescriptorValueProducer)(void);
+typedef void(^FaketoothDescriptorValueHandler)(id _Nullable);
 
 @interface FaketoothDescriptor : CBDescriptor
 
@@ -18,7 +19,7 @@ typedef id _Nullable(^FaketoothDescriptorValueProducer)(void);
 - (void)setValue:(nullable NSData*)value;
 
 - (instancetype)init;
-- (instancetype)initWithUUID:(CBUUID*)uuid valueProducer:(nullable FaketoothDescriptorValueProducer)valueProducer;
+- (instancetype)initWithUUID:(CBUUID*)uuid valueProducer:(nullable FaketoothDescriptorValueProducer)valueProducer valueHandler:(nullable FaketoothDescriptorValueHandler)valueHandler;
 
 @end
 

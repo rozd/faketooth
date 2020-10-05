@@ -30,11 +30,14 @@ class CharacteristicViewModel: NSObject, ObservableObject {
 
     let isReadSupported: Bool
 
+    let isWriteSupported: Bool
+
     init(characteristic: CBCharacteristic) {
         self.characteristic = characteristic
         self.characteristicUUID = characteristic.uuid.uuidString
         self.serviceUUID = characteristic.service.uuid.uuidString
         self.isReadSupported = characteristic.properties.contains(.read)
+        self.isWriteSupported = characteristic.properties.contains(.write)
 
         super.init()
     }
@@ -50,6 +53,10 @@ class CharacteristicViewModel: NSObject, ObservableObject {
     func readValue() {
         peripheral.readValue(for: characteristic)
     }
+
+    func writeValue() {
+        peripheral.writeValue("Hi!!".data(using: .utf8)!, for: characteristic, type: .withoutResponse)
+    }
 }
 
 // MARK: - CBPeripheralDelegate
@@ -64,4 +71,14 @@ extension CharacteristicViewModel: CBPeripheralDelegate {
         values.append(value)
     }
 
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+        peripheral.services?.forEach { peripheral.discoverCharacteristics(nil, for: $0) }
+    }
+
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        guard let characteristic = service.characteristics?.first else {
+            return;
+        }
+        peripheral.writeValue("Hello".data(using: .utf8)!, for: characteristic, type: .withoutResponse)
+    }
 }

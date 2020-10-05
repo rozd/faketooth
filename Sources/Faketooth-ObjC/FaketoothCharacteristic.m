@@ -16,7 +16,8 @@
     CBCharacteristicProperties _properties;
     BOOL _isNotifying;
     NSArray<CBDescriptor*>* _descriptors;
-    FaketoothPeripheralValueProducer _valueProducer;
+    FaketoothCharacteristicValueProducer _valueProducer;
+    FaketoothCharacteristicValueHandler _valueHandler;
     NSData* _value;
     NSTimer* _notifyTimer;
 }
@@ -51,6 +52,9 @@
 }
 - (void)setValue:(nullable NSData*)value {
     _value = value;
+    if (_valueHandler) {
+        _valueHandler(value);
+    }
 }
 
 - (nullable NSArray<CBDescriptor*>*)descriptors {
@@ -61,16 +65,16 @@
     return self;
 }
 
-- (instancetype)initWithUUID:(CBUUID*)uuid valueProducer:(nullable FaketoothPeripheralValueProducer)valueProducer properties:(CBCharacteristicProperties)properties {
-    self = [self initWithUUID:uuid valueProducer:valueProducer properties:properties descriptors:nil];
-    return self;
+- (instancetype)initWithUUID:(CBUUID*)uuid properties:(CBCharacteristicProperties)properties valueProducer:(nullable FaketoothCharacteristicValueProducer)valueProducer valueHandler:(nullable FaketoothCharacteristicValueHandler)valueHandler {
+    return [self initWithUUID:uuid properties:properties descriptors:nil valueProducer:valueProducer valueHandler:valueHandler];
 }
 
-- (instancetype)initWithUUID:(CBUUID*)uuid valueProducer:(nullable FaketoothPeripheralValueProducer)valueProducer properties:(CBCharacteristicProperties)properties descriptors:(nullable NSArray<CBDescriptor*>*)descriptors {
+- (instancetype)initWithUUID:(CBUUID*)uuid properties:(CBCharacteristicProperties)properties descriptors:(nullable NSArray<CBDescriptor*>*)descriptors valueProducer:(nullable FaketoothCharacteristicValueProducer)valueProducer valueHandler:(nullable FaketoothCharacteristicValueHandler)valueHandler {
     _uuid           = uuid;
     _properties     = properties;
     _descriptors    = descriptors;
     _valueProducer  = valueProducer;
+    _valueHandler   = valueHandler;
 
     [_descriptors enumerateObjectsUsingBlock:^(CBDescriptor * _Nonnull descriptor, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([descriptor isKindOfClass:[FaketoothDescriptor class]]) {

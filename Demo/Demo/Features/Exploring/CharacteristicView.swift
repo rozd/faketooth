@@ -31,6 +31,11 @@ struct CharacteristicView: View {
                             Text("Read")
                         }
                     }
+                    if self.viewModel.isWriteSupported {
+                        Button(action: self.onWrite) {
+                            Text("Write")
+                        }
+                    }
                 }
             }
         }
@@ -41,6 +46,10 @@ struct CharacteristicView: View {
     func onRead() {
         viewModel.readValue()
     }
+
+    func onWrite() {
+        viewModel.writeValue();
+    }
 }
 
 struct CharacteristicView_Previews: PreviewProvider {
@@ -49,8 +58,8 @@ struct CharacteristicView_Previews: PreviewProvider {
             CharacteristicViewModel(characteristic:
                 FaketoothCharacteristic(
                     uuid: CBUUID(),
-                    valueProducer: { nil },
-                    properties: CBCharacteristicProperties.read
+                    properties: CBCharacteristicProperties.read,
+                    valueProducer: { nil }
                 )
             )
         )
