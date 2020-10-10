@@ -40,7 +40,6 @@ final class CBCentralManagerTests: XCTestCase {
                         characteristics: [
                             FaketoothCharacteristic(
                                 uuid: CBUUID(),
-                                valueProducer: { return "Hello".data(using: .utf8) },
                                 properties: [.read, .notify],
                                 descriptors: [
                                     FaketoothDescriptor(
@@ -49,7 +48,8 @@ final class CBCentralManagerTests: XCTestCase {
                                             return Data(capacity: 2)
                                         }
                                     )
-                                ]
+                                ],
+                                valueProducer: { return "Hello".data(using: .utf8) }
                             )
                         ]
                     )
