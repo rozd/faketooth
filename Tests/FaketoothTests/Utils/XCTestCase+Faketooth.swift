@@ -1,20 +1,17 @@
 //
-//  File.swift
+//  File 2.swift
 //  
 //
-//  Created by Max Rozdobudko on 10/5/20.
+//  Created by Max Rozdobudko on 10/10/20.
 //
 
+import Foundation
 import XCTest
 @testable import Faketooth
 
-final class CBCentralManagerTests: XCTestCase {
+extension XCTestCase {
 
-    static var allTests = [
-        ("testExample", test_scanForPeripherals),
-    ]
-
-    override class func setUp() {
+    class func faketoothSetupTestPeripherals() {
         FaketoothSettings.delay = FaketoothDelaySettings(
             scanForPeripheralDelayInSeconds: 0.1,
             connectPeripheralDelayInSeconds: 0.1,
@@ -32,7 +29,7 @@ final class CBCentralManagerTests: XCTestCase {
 
         CBCentralManager.simulatedPeripherals = [
             FaketoothPeripheral(
-                identifier: UUID(),
+                identifier: UUID(uuidString: "68753A44-4D6F-1226-9C60-0050E4C00067")!,
                 name: "Test", services: [
                     FaketoothService(
                         uuid: CBUUID(),
@@ -60,54 +57,4 @@ final class CBCentralManagerTests: XCTestCase {
             )
         ]
     }
-
-    var centralManager: CBCentralManager!
-    var centralManagerDelegate: CentralManagerDelegate!
-
-    override func setUp() {
-        centralManagerDelegate = CentralManagerDelegate()
-        centralManager = CBCentralManager(delegate: centralManagerDelegate, queue: nil)
-    }
-
-    override func tearDown() {
-        centralManagerDelegate = nil
-        centralManager = nil
-    }
-
-    func test_scanForPeripherals() {
-        let expectation = XCTestExpectation(description: "Scan for peripherals")
-
-        centralManagerDelegate.onCentralManagerDidDiscoverPeripheral = { (peripheral: CBPeripheral, advertisementData: [String : Any], rssi: NSNumber) in
-            if (peripheral.name == "Test") {
-                expectation.fulfill()
-            }
-        }
-
-        centralManager.scanForPeripherals(withServices: nil, options: nil)
-
-        wait(for: [expectation], timeout: 1.0)
-    }
-
-}
-
-// MARK: - CentralManagerDelegate
-
-class CentralManagerDelegate: NSObject, CBCentralManagerDelegate {
-
-    // centralManagerDidUpdateState(_:)
-
-    var onCentralManagerDidUpdateState: ((_ central: CBCentralManager) -> Void)?
-
-    func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        onCentralManagerDidUpdateState?(central)
-    }
-
-    // centralManager(_:didDiscover:advertisementData:rssi:)
-
-    var onCentralManagerDidDiscoverPeripheral: ((_ peripheral: CBPeripheral, _ advertisementData: [String : Any], _ RSSI: NSNumber) -> Void)?
-
-    func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-        onCentralManagerDidDiscoverPeripheral?(peripheral, advertisementData, RSSI)
-    }
-
 }

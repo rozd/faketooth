@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (class, nullable, nonatomic) NSArray<FaketoothPeripheral*>* simulatedPeripherals;
 
-@property (class) BOOL isSimulated;
+@property (class, readonly) BOOL isSimulated;
 
 @end
 

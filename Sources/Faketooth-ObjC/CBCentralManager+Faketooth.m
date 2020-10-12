@@ -11,7 +11,12 @@
 #import "CBCentralManager+Faketooth.h"
 #import "FaketoothSettings.h"
 
-@implementation CBCentralManager (Goldtooth)
+static char isScanningWhenUseFaketoothKey;
+static char stateWhenUseFaketoothKey;
+
+@implementation CBCentralManager (Faketooth)
+
+#pragma mark - Faketooth settings for CBCentralManager
 
 static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
 + (NSArray<FaketoothPeripheral*>*)simulatedPeripherals {
@@ -38,6 +43,10 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
                 NSStringFromSelector(@selector(faketooth_scanForPeripheralsWithServices:options:))
             ],
             @[
+                NSStringFromSelector(@selector(stopScan)),
+                NSStringFromSelector(@selector(faketooth_stopScan))
+            ],
+            @[
                 NSStringFromSelector(@selector(retrievePeripheralsWithIdentifiers:)),
                 NSStringFromSelector(@selector(faketooth_retrievePeripheralsWithIdentifiers:))
             ],
@@ -48,6 +57,14 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
             @[
                 NSStringFromSelector(@selector(cancelPeripheralConnection:)),
                 NSStringFromSelector(@selector(faketooth_cancelPeripheralConnection:))
+            ],
+            @[
+                NSStringFromSelector(@selector(isScanning)),
+                NSStringFromSelector(@selector(faketooth_isScanning))
+            ],
+            @[
+                NSStringFromSelector(@selector(state)),
+                NSStringFromSelector(@selector(faketooth_state))
             ]
         ];
 
@@ -76,23 +93,55 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
     });
 }
 
-#pragma mark - Overridden methods
+#pragma mark - Faketooth properties
 
-- (CBManagerState)state {
-    if (!CBCentralManager.simulatedPeripherals) {
-        return [super state];
+- (BOOL)isScanningWhenUseFaketooth {
+    NSNumber* number = objc_getAssociatedObject(self, &isScanningWhenUseFaketoothKey);
+    return [number boolValue];
+}
+- (void)setIsScanningWhenUseFaketooth:(BOOL)value {
+    NSNumber* number = [NSNumber numberWithBool:value];
+    objc_setAssociatedObject(self, &isScanningWhenUseFaketoothKey, number, OBJC_ASSOCIATION_RETAIN);
+}
+
+- (CBManagerState)stateWhenUseFaketooth {
+    NSNumber* number = objc_getAssociatedObject(self, &stateWhenUseFaketoothKey);
+    if (!number) {
+        return CBManagerStatePoweredOn;
     }
-    return CBManagerStatePoweredOn;
+    return (CBManagerState) [number integerValue];
+}
+- (void)setStateWhenUseFaketooth:(CBManagerState)state {
+    NSNumber* number = [NSNumber numberWithInteger:state];
+    objc_setAssociatedObject(self, &stateWhenUseFaketoothKey, number, OBJC_ASSOCIATION_RETAIN);
+}
+
+#pragma mark - Swizzled properties
+
+- (CBManagerState)faketooth_state {
+    if (![self canContinueFaketoothSimulation]) {
+        return [self faketooth_state];
+    }
+    return [self stateWhenUseFaketooth];
+}
+
+- (BOOL)faketooth_isScanning {
+    if (![self canContinueFaketoothSimulation]) {
+        return [self faketooth_isScanning];
+    }
+    return [self isScanningWhenUseFaketooth];
 }
 
 #pragma mark - Swizzled methods
 
 - (void)faketooth_scanForPeripheralsWithServices:(nullable NSArray<CBUUID *> *)serviceUUIDs options:(nullable NSDictionary<NSString *, id> *)options {
     NSLog(@"[Faketooth] scanForPeripheralsWithServices:options:");
-    if (!CBCentralManager.simulatedPeripherals) {
+    if (![self canContinueFaketoothSimulation]) {
         [self faketooth_scanForPeripheralsWithServices:serviceUUIDs options:options];
         return;
     }
+
+    [self setIsScanningWhenUseFaketooth:YES];
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FaketoothSettings.delay.scanForPeripheralDelayInSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (self.delegate && [self.delegate respondsToSelector:@selector(centralManager:didDiscoverPeripheral:advertisementData:RSSI:)]) {
@@ -103,9 +152,18 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
     });
 }
 
+- (void)faketooth_stopScan {
+    NSLog(@"[Faketooth] stopScan");
+    if (![self canContinueFaketoothSimulation]) {
+        [self faketooth_stopScan];
+        return;
+    }
+    [self setIsScanningWhenUseFaketooth:NO];
+}
+
 - (NSArray<CBPeripheral*>*)faketooth_retrievePeripheralsWithIdentifiers:(NSArray<NSUUID *> *)identifiers {
     NSLog(@"[Faketooth] retrievePeripheralsWithIdentifiers:");
-    if (!CBCentralManager.simulatedPeripherals) {
+    if (![self canContinueFaketoothSimulation]) {
         return [self faketooth_retrievePeripheralsWithIdentifiers:identifiers];
     }
 
@@ -116,7 +174,7 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
 
 - (void)faketooth_connectPeripheral:(CBPeripheral *)peripheral options:(NSDictionary<NSString *,id> *)options {
     NSLog(@"[Faketooth] connectPeripheral:options:");
-    if (!CBCentralManager.simulatedPeripherals) {
+    if (![self canContinueFaketoothSimulation]) {
         [self faketooth_connectPeripheral:peripheral options:options];
         return;
     }
@@ -141,7 +199,7 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
 
 - (void)faketooth_cancelPeripheralConnection:(CBPeripheral *)peripheral {
     NSLog(@"[Faketooth] cancelPeripheralConnection:");
-    if (!CBCentralManager.simulatedPeripherals) {
+    if (![self canContinueFaketoothSimulation]) {
         [self faketooth_cancelPeripheralConnection:peripheral];
         return;
     }
@@ -162,6 +220,16 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
             [self.delegate centralManager:self didDisconnectPeripheral:peripheral error:nil];
         }
     });
+}
+
+#pragma mark - Faketooth utils
+
+- (BOOL)canContinueFaketoothSimulation {
+    if (!CBCentralManager.simulatedPeripherals) {
+        NSLog(@"[Faketooth] Warning: Faketooth is enabled while no simulated peripheral are defined. Make sure you don't use Faketooth on producetion.");
+        return NO;
+    }
+    return YES;
 }
 
 @end
