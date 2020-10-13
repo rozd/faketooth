@@ -14,10 +14,6 @@ final class CBCentralManagerTest: XCTestCase {
         ("testExample", testScanForPeripherals),
     ]
 
-    override class func setUp() {
-        faketoothSetupTestPeripherals()
-    }
-
     var centralManager: CBCentralManager!
     var centralManagerDelegate: CentralManagerDelegate!
 
@@ -27,6 +23,7 @@ final class CBCentralManagerTest: XCTestCase {
     }
 
     override func tearDown() {
+        faketoothTearDown()
         centralManagerDelegate = nil
         centralManager = nil
     }
@@ -34,14 +31,18 @@ final class CBCentralManagerTest: XCTestCase {
     // MARK: Tests
 
     func testState() {
-        XCTAssertEqual(centralManager.state, CBManagerState.poweredOn, "CentralManager.state should be On when Faketooth is enabled")
+        XCTAssertEqual(centralManager.state, CBManagerState.unknown, "CentralManager.state should be Unknown when Faketooth is not enabled")
+        faketoothSetup()
+        XCTAssertEqual(centralManager.state, CBManagerState.poweredOn, "CentralManager.state should be Powered On when Faketooth is enabled")
     }
 
     func testScanForPeripherals() {
+        faketoothSetup()
+
         let expectation = XCTestExpectation(description: "Scan for peripherals")
 
         centralManagerDelegate.onDidDiscoverPeripheral = { (peripheral: CBPeripheral, advertisementData: [String : Any], rssi: NSNumber) in
-            if (peripheral.name == "Test") {
+            if (peripheral.name == "Test Peripheral") {
                 expectation.fulfill()
             }
         }
@@ -52,6 +53,8 @@ final class CBCentralManagerTest: XCTestCase {
     }
 
     func testIsScanning() {
+        faketoothSetup()
+
         XCTAssertFalse(centralManager.isScanning, "CentralManager.isScanning property should be false on start of the test")
 
         centralManager.scanForPeripherals(withServices: nil, options: nil)
@@ -61,9 +64,17 @@ final class CBCentralManagerTest: XCTestCase {
         centralManager.stopScan()
 
         XCTAssertFalse(centralManager.isScanning, "CentralManager.isScanning property didn't switch to false after scan stopped")
+
+        centralManager.scanForPeripherals(withServices: nil, options: nil)
+
+        faketoothTearDown()
+
+        XCTAssertFalse(centralManager.isScanning)
     }
 
     func testRetrievePeripheralsWithIdentifiers() {
+        faketoothSetup()
+
         let foundPeripherals = centralManager.retrievePeripherals(withIdentifiers: [UUID(uuidString: "68753A44-4D6F-1226-9C60-0050E4C00067")!])
 
         let hasPeripheralWithSimulatedIdentifier = foundPeripherals.contains { $0.identifier == UUID(uuidString: "68753A44-4D6F-1226-9C60-0050E4C00067")!}
@@ -74,6 +85,8 @@ final class CBCentralManagerTest: XCTestCase {
     }
 
     func testConnectPeripheral() {
+        faketoothSetup()
+
         guard let peripheral = centralManager.retrievePeripherals(withIdentifiers: [UUID(uuidString: "68753A44-4D6F-1226-9C60-0050E4C00067")!]).first else {
             XCTFail("Unable to find simulated peripheral")
             return
@@ -95,6 +108,49 @@ final class CBCentralManagerTest: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
     }
 
+    func testIsSimulated() {
+        faketoothSetup()
+        XCTAssertTrue(CBCentralManager.isSimulated)
+
+        faketoothTearDown()
+        XCTAssertFalse(CBCentralManager.isSimulated)
+    }
+
+    func testFaketoothMethods() {
+
+        faketoothSetup()
+
+        // test private stateWhenUseFaketooth property
+
+        centralManager.perform(NSSelectorFromString("setStateWhenUseFaketooth:"), with: NSNumber(value: CBManagerState.resetting.rawValue))
+        guard let stateNumber = centralManager.perform(NSSelectorFromString("stateWhenUseFaketooth"))?.takeUnretainedValue() as? NSNumber else {
+            XCTFail("Can't convert value to NSNumber")
+            return
+        }
+
+        guard let state = CBManagerState(rawValue: stateNumber.intValue) else {
+            XCTFail("Can't convert received number to CBManagerState")
+            return
+        }
+
+        XCTAssertEqual(state, CBManagerState.resetting)
+
+        XCTAssertEqual(centralManager.state, CBManagerState.resetting)
+
+        // test private isScanningWhenUseFaketooth property
+
+        centralManager.perform(NSSelectorFromString("setIsScanningWhenUseFaketooth:"), with: NSNumber(booleanLiteral: true))
+        guard let isScanningNumber = centralManager.perform(NSSelectorFromString("isScanningWhenUseFaketooth"))?.takeUnretainedValue() as? NSNumber else {
+            XCTFail("Can't convert value to NSNumber")
+            return
+        }
+
+        let isScanning = isScanningNumber.boolValue
+
+        XCTAssertTrue(isScanning)
+
+        XCTAssertTrue(centralManager.isScanning)
+    }
 }
 
 // MARK: - CentralManagerDelegate

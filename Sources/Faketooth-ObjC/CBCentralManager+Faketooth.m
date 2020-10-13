@@ -95,25 +95,18 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
 
 #pragma mark - Faketooth properties
 
-- (BOOL)isScanningWhenUseFaketooth {
-    NSNumber* number = objc_getAssociatedObject(self, &isScanningWhenUseFaketoothKey);
-    return [number boolValue];
+- (NSNumber*)isScanningWhenUseFaketooth {
+    return objc_getAssociatedObject(self, &isScanningWhenUseFaketoothKey);
 }
-- (void)setIsScanningWhenUseFaketooth:(BOOL)value {
-    NSNumber* number = [NSNumber numberWithBool:value];
-    objc_setAssociatedObject(self, &isScanningWhenUseFaketoothKey, number, OBJC_ASSOCIATION_RETAIN);
+- (void)setIsScanningWhenUseFaketooth:(NSNumber*)value {
+    objc_setAssociatedObject(self, &isScanningWhenUseFaketoothKey, value, OBJC_ASSOCIATION_RETAIN);
 }
 
-- (CBManagerState)stateWhenUseFaketooth {
-    NSNumber* number = objc_getAssociatedObject(self, &stateWhenUseFaketoothKey);
-    if (!number) {
-        return CBManagerStatePoweredOn;
-    }
-    return (CBManagerState) [number integerValue];
+- (NSNumber*)stateWhenUseFaketooth {
+    return objc_getAssociatedObject(self, &stateWhenUseFaketoothKey);
 }
-- (void)setStateWhenUseFaketooth:(CBManagerState)state {
-    NSNumber* number = [NSNumber numberWithInteger:state];
-    objc_setAssociatedObject(self, &stateWhenUseFaketoothKey, number, OBJC_ASSOCIATION_RETAIN);
+- (void)setStateWhenUseFaketooth:(NSNumber*)state {
+    objc_setAssociatedObject(self, &stateWhenUseFaketoothKey, state, OBJC_ASSOCIATION_RETAIN);
 }
 
 #pragma mark - Swizzled properties
@@ -122,14 +115,19 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
     if (![self canContinueFaketoothSimulation]) {
         return [self faketooth_state];
     }
-    return [self stateWhenUseFaketooth];
+    NSNumber* number = [self stateWhenUseFaketooth];
+    if (!number) {
+        return CBManagerStatePoweredOn;
+    }
+    return (CBManagerState) [number integerValue];
 }
 
 - (BOOL)faketooth_isScanning {
     if (![self canContinueFaketoothSimulation]) {
         return [self faketooth_isScanning];
     }
-    return [self isScanningWhenUseFaketooth];
+    NSNumber* number = [self isScanningWhenUseFaketooth];
+    return [number boolValue];
 }
 
 #pragma mark - Swizzled methods
@@ -141,7 +139,7 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
         return;
     }
 
-    [self setIsScanningWhenUseFaketooth:YES];
+    [self setIsScanningWhenUseFaketooth:[NSNumber numberWithBool:YES]];
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FaketoothSettings.delay.scanForPeripheralDelayInSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (self.delegate && [self.delegate respondsToSelector:@selector(centralManager:didDiscoverPeripheral:advertisementData:RSSI:)]) {
@@ -158,7 +156,7 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
         [self faketooth_stopScan];
         return;
     }
-    [self setIsScanningWhenUseFaketooth:NO];
+    [self setIsScanningWhenUseFaketooth:[NSNumber numberWithBool:NO]];
 }
 
 - (NSArray<CBPeripheral*>*)faketooth_retrievePeripheralsWithIdentifiers:(NSArray<NSUUID *> *)identifiers {
