@@ -6,8 +6,17 @@
 //
 
 import Foundation
-import CoreBluetooth
+@testable import Faketooth
 
 class MockPeripheral : CBPeripheral {
+
+    init(onlyForTests: Bool) {
+
+    }
+
+    func setup() {
+        // adds observer as removing it is one of phases of clean up CBPeripheral instance
+        addObserver(self, forKeyPath: "delegate", options: [], context: nil)
+    }
 
 }

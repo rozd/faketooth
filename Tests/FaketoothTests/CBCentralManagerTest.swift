@@ -75,28 +75,38 @@ final class CBCentralManagerTest: XCTestCase {
     func testRetrievePeripheralsWithIdentifiers() {
         faketoothSetup()
 
-        let foundPeripherals = centralManager.retrievePeripherals(withIdentifiers: [UUID(uuidString: "68753A44-4D6F-1226-9C60-0050E4C00067")!])
+        let foundPeripherals = centralManager.retrievePeripherals(withIdentifiers: [.testPeripheral])
 
-        let hasPeripheralWithSimulatedIdentifier = foundPeripherals.contains { $0.identifier == UUID(uuidString: "68753A44-4D6F-1226-9C60-0050E4C00067")!}
-        XCTAssertTrue(hasPeripheralWithSimulatedIdentifier, "Found peripherals list doesn't contain simulated peripheral")
+        XCTAssertTrue(
+            foundPeripherals.contains { $0.identifier == .testPeripheral },
+            "Found peripherals list doesn't contain simulated peripheral"
+        )
 
-        let hasPeripheralWithUnknownIdentifier = foundPeripherals.contains { $0.identifier == UUID(uuidString: "00000000-4D6F-1226-9C60-0050E4C00067") }
-        XCTAssertFalse(hasPeripheralWithUnknownIdentifier, "Found peripherals list contains a peripheral with an identifier not used on simulation")
+        XCTAssertFalse(
+            foundPeripherals.contains { $0.identifier == .unknownPeripheral },
+            "Found peripherals list contains a peripheral with an identifier not used on simulation"
+        )
     }
 
     func testConnectPeripheral() {
         faketoothSetup()
 
-        guard let peripheral = centralManager.retrievePeripherals(withIdentifiers: [UUID(uuidString: "68753A44-4D6F-1226-9C60-0050E4C00067")!]).first else {
+        guard let peripheral = centralManager.retrievePeripherals(withIdentifiers: [.testPeripheral]).first else {
             XCTFail("Unable to find simulated peripheral")
             return
         }
 
-        XCTAssertEqual(peripheral.state, CBPeripheralState.disconnected, "Before connecting the peripheral should be in disconnected state")
+        XCTAssertEqual(
+            peripheral.state, CBPeripheralState.disconnected,
+            "Before connecting the peripheral should be in disconnected state"
+        )
 
         centralManager.connect(peripheral, options: nil)
 
-        XCTAssertEqual(peripheral.state, CBPeripheralState.connecting, "Peripheral's state should switch to connecting after connection is started")
+        XCTAssertEqual(
+            peripheral.state, CBPeripheralState.connecting,
+            "Peripheral's state should switch to connecting after connection is started"
+        )
 
         let expectation = XCTestExpectation(description: "Connect to Peripheral")
 
@@ -108,12 +118,54 @@ final class CBCentralManagerTest: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
     }
 
+    func testCancelPeripheralConnection() {
+        let peripheral = faketoothSetupPeripheral()
+
+        faketoothSetup(peripherals: [peripheral])
+
+        XCTAssertEqual(peripheral.state, CBPeripheralState.disconnected)
+
+        let expectation = XCTestExpectation(description: "Cancel Peripheral connection")
+        centralManagerDelegate.onDidDisconnectPeripheral = { pPeripheral, pError in
+            expectation.fulfill()
+            XCTAssertEqual(peripheral, pPeripheral)
+            XCTAssertEqual(peripheral.state, CBPeripheralState.disconnected)
+        }
+
+        centralManagerDelegate.onDidConnectPeripheral = { _ in
+            XCTFail("Peripheral connection should be cancelled")
+        }
+
+        centralManager.connect(peripheral, options: nil)
+        XCTAssertEqual(peripheral.state, CBPeripheralState.connecting)
+
+        centralManager.cancelPeripheralConnection(peripheral)
+        XCTAssertEqual(peripheral.state, CBPeripheralState.disconnecting)
+
+        wait(for: [expectation], timeout: 1.0)
+    }
+
     func testIsSimulated() {
         faketoothSetup()
         XCTAssertTrue(CBCentralManager.isSimulated)
 
         faketoothTearDown()
         XCTAssertFalse(CBCentralManager.isSimulated)
+    }
+
+    // MARK: Test fallbacks to CoreBluetooth implementation
+
+    func testFallbackToBluetoothScanForPeripherals() {
+
+        let expectattion = XCTestExpectation(description: "Fallback to Bluetooth scanForPeripherals() method")
+        expectattion.isInverted = true
+
+        centralManagerDelegate.onDidDiscoverPeripheral = { _, _, _ in
+            expectattion.fulfill()
+        }
+        centralManager.scanForPeripherals(withServices: nil, options: nil)
+
+        wait(for: [expectattion], timeout: Double(FaketoothSettings.delay.scanForPeripheralDelayInSeconds) + 0.1)
     }
 
     func testFaketoothMethods() {
@@ -187,5 +239,13 @@ class CentralManagerDelegate: NSObject, CBCentralManagerDelegate {
 
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
         onDidFailToConnect?(peripheral, error)
+    }
+
+    // centralManager(_:didDisconnectPeripheral:error:)
+
+    var onDidDisconnectPeripheral: ((_ peripheral: CBPeripheral, _ error: Error?) -> Void)?
+
+    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        onDidDisconnectPeripheral?(peripheral, error)
     }
 }

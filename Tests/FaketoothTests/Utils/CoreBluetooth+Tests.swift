@@ -15,6 +15,10 @@ extension UUID {
         return UUID(uuidString: "68753A44-4D6F-1226-9C60-0050E4C00067")!
     }
 
+    static var unknownPeripheral: UUID {
+        return UUID(uuidString: "00000000-4D6F-1226-9C60-0050E4C00067")!
+    }
+
 }
 
 extension CBUUID {

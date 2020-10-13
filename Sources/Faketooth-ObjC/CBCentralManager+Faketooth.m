@@ -13,6 +13,7 @@
 
 static char isScanningWhenUseFaketoothKey;
 static char stateWhenUseFaketoothKey;
+static char isConnectionCancelledKey;
 
 @implementation CBCentralManager (Faketooth)
 
@@ -109,6 +110,15 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
     objc_setAssociatedObject(self, &stateWhenUseFaketoothKey, state, OBJC_ASSOCIATION_RETAIN);
 }
 
+- (BOOL)isConnectionCancelled {
+    NSNumber* number = objc_getAssociatedObject(self, &isConnectionCancelledKey);
+    return [number boolValue];
+}
+- (void)setConnectionCancelled:(BOOL)value {
+    NSNumber* number = [NSNumber numberWithBool:value];
+    objc_setAssociatedObject(self, &isConnectionCancelledKey, number, OBJC_ASSOCIATION_RETAIN);
+}
+
 #pragma mark - Swizzled properties
 
 - (CBManagerState)faketooth_state {
@@ -187,7 +197,12 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
 
     [faketoothPeripheral setState:CBPeripheralStateConnecting];
 
+    [self setConnectionCancelled:NO];
+
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FaketoothSettings.delay.connectPeripheralDelayInSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if ([self isConnectionCancelled]) {
+            return;
+        }
         [faketoothPeripheral setState:CBPeripheralStateConnected];
         if (self.delegate && [self.delegate respondsToSelector:@selector(centralManager:didConnectPeripheral:)]) {
             [self.delegate centralManager:self didConnectPeripheral:peripheral];
@@ -210,6 +225,8 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
         return;
     }
 
+    [self setConnectionCancelled:YES];
+
     [faketoothPeripheral setState:CBPeripheralStateDisconnecting];
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FaketoothSettings.delay.cancelPeripheralConnectionDelayInSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -223,7 +240,7 @@ static NSArray<FaketoothPeripheral*>* _simulatedPeripherals = nil;
 #pragma mark - Faketooth utils
 
 - (BOOL)canContinueFaketoothSimulation {
-    if (!CBCentralManager.simulatedPeripherals) {
+    if (!CBCentralManager.isSimulated) {
         NSLog(@"[Faketooth] Warning: Faketooth is enabled while no simulated peripheral are defined. Make sure you don't use Faketooth on producetion.");
         return NO;
     }
