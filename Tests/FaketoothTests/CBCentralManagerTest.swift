@@ -153,20 +153,7 @@ final class CBCentralManagerTest: XCTestCase {
         XCTAssertFalse(CBCentralManager.isSimulated)
     }
 
-    // MARK: Test fallbacks to CoreBluetooth implementation
-
-    func testFallbackToBluetoothScanForPeripherals() {
-
-        let expectattion = XCTestExpectation(description: "Fallback to Bluetooth scanForPeripherals() method")
-        expectattion.isInverted = true
-
-        centralManagerDelegate.onDidDiscoverPeripheral = { _, _, _ in
-            expectattion.fulfill()
-        }
-        centralManager.scanForPeripherals(withServices: nil, options: nil)
-
-        wait(for: [expectattion], timeout: Double(FaketoothSettings.delay.scanForPeripheralDelayInSeconds) + 0.1)
-    }
+    // MARK: Faketooth private methods
 
     func testFaketoothMethods() {
 

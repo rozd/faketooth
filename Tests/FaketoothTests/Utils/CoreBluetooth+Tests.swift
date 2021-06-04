@@ -8,6 +8,7 @@
 import Foundation
 import CoreBluetooth
 import Faketooth
+import UIKit
 
 extension UUID {
 
